@@ -3,20 +3,9 @@ import './App.css';
 import TodoListFooter from "./components/TodoListFooter/TodoListFooter";
 import TodoListHeader from "./components/TodoListHeader/TodoListHeader";
 import TodoListTasks from "./components/TodoListTasks/TodoListTasks";
+import PropTypes from 'prop-types';
 
 class App extends React.Component {
-
-  constructor(props) {
-    super(props)
-    this.newTaskTitleRef = React.createRef();
-    setTimeout(() => {
-      let newTasks = [...this.state.tasks, { title: "Angular", isDone: false, priority: "low" }]
-      this.setState({
-        tasks: newTasks,
-        filterValue: "Completed"
-      });
-    }, 2000);
-  }
   state = {
     tasks: [
       { title: "JS", isDone: true, priority: "low" },
@@ -24,36 +13,41 @@ class App extends React.Component {
       { title: "CSS", isDone: true, priority: "medium" },
       { title: "React", isDone: false, priority: "high" }
     ],
-    // Active, All, Completed
     filterValue: "All"
   }
+  
+  changeFilter = (newFilterValue) => {
+    this.setState({
+      filterValue: newFilterValue
+    });
+  }
 
-  onAddTaskClick = () => {
-    let newText = this.newTaskTitleRef.current.value
+  addTask = (newText) => {
     let newTask = { title: newText, isDone: false, priority: "low" }
     let newTasks = [...this.state.tasks, newTask]
     this.setState({
       tasks: newTasks,
-      filterValue: "All"
     });
-    this.newTaskTitleRef.current.value = "";
   }
 
   render = () => {
-
+    console.log(this);
     return (
       <div className="App">
         <div className="todoList">
-          {/* <TodoListHeader/> */}
-          <div className="todoList-header">
-            <h3 className="todoList-header__title">What to Learn</h3>
-            <div className="todoList-newTaskForm">
-              <input ref={this.newTaskTitleRef} type="text" placeholder="New task name" />
-              <button onClick={this.onAddTaskClick}>Add</button>
-            </div>
-          </div>
-          <TodoListTasks tasks={this.state.tasks} />
-          <TodoListFooter filterValue={this.state.filterValue} />
+          <TodoListHeader addTask={this.addTask}/>
+          <TodoListTasks tasks={this.state.tasks.filter(t => {
+              if (this.state.filterValue === "All") {
+                return true;
+              }
+              if (this.state.filterValue === "Completed") {
+                return t.isDone === true;
+              }
+              if (this.state.filterValue === "Active") {
+                return t.isDone === false;
+              }
+          })} />
+          <TodoListFooter filterValue={this.state.filterValue} changeFilter={this.changeFilter}/>
         </div>
       </div>
     );
@@ -61,4 +55,8 @@ class App extends React.Component {
 }
 
 export default App;
+
+App.propTypes = {
+  filterValue: PropTypes.array
+};
 
