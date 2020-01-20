@@ -32,7 +32,7 @@ class App extends React.Component {
 
   changeStatus = (task, isDone) => {
     let newTasks = this.state.tasks.map(t => {
-      if (t != task) {
+      if (t !== task) {
         return t;
       } else {
         return {...t, isDone: isDone}
@@ -45,7 +45,6 @@ class App extends React.Component {
   }
 
   render = () => {
-    console.log(this);
     return (
       <div className="App">
         <div className="todoList">
