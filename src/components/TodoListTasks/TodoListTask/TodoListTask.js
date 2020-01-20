@@ -1,4 +1,5 @@
 import React from 'react';
+import './TodoListTask.css'
 
 class TodoListTask extends React.Component {
 
@@ -7,8 +8,10 @@ class TodoListTask extends React.Component {
   }
 
   render = () => {
+    let taskStatus = this.props.task.isDone ? "todoList-task done": "todoList-task"
+
     return (
-      <div className="todoList-task">
+      <div className={taskStatus}>
         <input type="checkbox"
                checked={this.props.task.isDone}
                onChange={this.onIsDoneChanged} 
