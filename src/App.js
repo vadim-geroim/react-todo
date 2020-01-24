@@ -7,16 +7,40 @@ import PropTypes from 'prop-types';
 
 class App extends React.Component {
 
-  nextTaskId = 4;
-
   state = {
     tasks: [
-      { id: 0, title: "JS", isDone: true, priority: "low" },
-      { id: 1, title: "HTML", isDone: true, priority: "high" },
-      { id: 2, title: "CSS", isDone: true, priority: "medium" },
-      { id: 3, title: "React", isDone: false, priority: "high" }
+      // { id: 0, title: "JS", isDone: true, priority: "low" },
+      // { id: 1, title: "HTML", isDone: true, priority: "high" },
+      // { id: 2, title: "CSS", isDone: true, priority: "medium" },
+      // { id: 3, title: "React", isDone: false, priority: "high" }
     ],
-    filterValue: "All"
+    filterValue: "All",
+    nextTaskId: 0
+  }
+
+  componentDidMount() {
+    this.restoreState();
+  }
+
+  saveState = () => {
+    // obj to string
+    let stateAsString = JSON.stringify(this.state);
+    localStorage.setItem("our-state", stateAsString);
+  }
+
+  restoreState = () => {
+    // update state
+    let state = {
+      tasks: [],
+      filterValue: "All",
+      nextTaskId: 0
+    };
+
+    let stateAsString = localStorage.getItem("our-state");
+    if (stateAsString != null) {
+      state = JSON.parse(stateAsString);
+    }
+    this.setState(state);
   }
   
   changeFilter = (newFilterValue) => {
@@ -26,40 +50,36 @@ class App extends React.Component {
   }
 
   addTask = (newText) => {
-    let newTask = { id: this.nextTaskId, title: newText, isDone: false, priority: "low" }
-    this.nextTaskId++;
+    let newTask = { id: this.state.nextTaskId, title: newText, isDone: false, priority: "low" }
     let newTasks = [...this.state.tasks, newTask]
+    
     this.setState({
       tasks: newTasks,
+      nextTaskId: this.state.nextTaskId + 1
+    }, () => { this.saveState(); });
+    
+  }
+
+  changeTask = (taskId, obj) => {
+    let newTasks = this.state.tasks.map(t => {
+      if (t.id !== taskId) {
+        return t;
+      } else {
+        return {...t, ...obj}
+      }
+    });
+
+    this.setState({
+      tasks: newTasks
     });
   }
 
   changeStatus = (taskId, isDone) => {
-    let newTasks = this.state.tasks.map(t => {
-      if (t.id !== taskId) {
-        return t;
-      } else {
-        return {...t, isDone: isDone}
-      }
-    });
-
-    this.setState({
-      tasks: newTasks
-    });
+    this.changeTask(taskId, {isDone: isDone})
   }
 
   changeTaskTitle = (taskId, textTitle) => {
-    let newTasks = this.state.tasks.map(t => {
-      if (t.id !== taskId) {
-        return t;
-      } else {
-        return {...t, title: textTitle}
-      }
-    });
-
-    this.setState({
-      tasks: newTasks
-    });
+    this.changeTask(taskId, {title: textTitle})
   }
 
   render = () => {
